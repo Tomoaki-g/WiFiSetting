@@ -27,31 +27,6 @@ UIKit + UICollectionViewDiffableDataSourceを学ぶためのWi-Fi設定デモ。
 
 Snapshotにタイトルや接続状態ではなく安定したIDを渡し、同じIDの内容変更は`reconfigureItems`で反映します。
 
-## Macへの配置
-
-ダウンロードしたZIPを展開し、フォルダ全体を`/Users/apple/Documents/workplace/GitHub/CollectionViewPractice`に置きます。既存フォルダがある場合は上書きせず、別名にしてください。
-
-## Tomoaki-gに新しい非公開リポジトリを作成
-
-GitHub CLI (`gh`)がない場合は先にインストールしてください。以下はMacのターミナルで実行します。
-
-```bash
-cd /Users/apple/Documents/workplace/GitHub/CollectionViewPractice
-gh auth login
-gh api user --jq .login
-```
-
-表示されたアカウントが`Tomoaki-g`であることを確認してから続けます。別アカウントなら`gh auth switch --user Tomoaki-g`で切り替え、もう一度確認してください。
-
-```bash
-git init -b main
-git add .
-git commit -m "Add UICollectionView Wi-Fi settings demo"
-gh repo create Tomoaki-g/CollectionViewPractice --private --source=. --remote=origin --push
-```
-
-同名リポジトリがすでに存在する場合は作成を中止し、既存の内容を確認してから接続してください。force pushは不要です。
-
 ## 参考
 
 - [Qiita記事のWiFiSettingsViewController](https://qiita.com/shiz/items/a6032543a237bf2e1d19)
