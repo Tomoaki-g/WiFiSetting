@@ -1,10 +1,10 @@
-# CollectionViewPractice
+# WiFiSetting
 
 UIKit + UICollectionViewDiffableDataSourceを学ぶためのWi-Fi設定デモ。iOS 16以降、外部ライブラリ・Storyboardなし。
 
 ## 起動
 
-`CollectionViewPractice.xcodeproj`をXcodeで開き、CollectionViewPracticeスキームとiPhoneシミュレータを選んで実行します。実機ではSigning & CapabilitiesのTeamを設定してください。
+`WiFiSetting.xcodeproj`をXcodeで開き、WiFiSettingスキームとiPhoneシミュレータを選んで実行します。実機ではSigning & CapabilitiesのTeamを設定してください。
 
 ## 確認できる動作
 
@@ -36,4 +36,4 @@ Snapshotにタイトルや接続状態ではなく安定したIDを渡し、同�
 
 ## 検証について
 
-作成環境はLinuxのため、Xcodeによるビルドとシミュレータでの動作確認は未実施です。プロジェクト設定とファイル参照の整合性を静的確認しています。
+XcodeでiOS Simulator向けのDebugビルド成功を確認しています（コード署名なし）。シミュレータでの起動・操作確認は未実施です。
