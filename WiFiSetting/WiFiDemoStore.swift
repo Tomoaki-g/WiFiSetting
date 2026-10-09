@@ -25,7 +25,8 @@ final class WiFiDemoStore {
     }
 
     var availableNetworks: [Network] {
-        // 5秒ごとに一部のネットワークが出入りする。IDは毎回同じ。
+        // scan()が呼ばれるたびに、表示対象を３パターンで切り替える。各ネットワークのIDは固定。
+        // availableNetworksの読み取りだけではパターンは進まない。５秒のTimerはViewController側で管理する。
         let visibleIDs: Set<String>
         switch scanStep % 3 {
         case 0: visibleIDs = ["home", "office", "cafe"]

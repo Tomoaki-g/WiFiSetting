@@ -3,7 +3,7 @@ import UIKit
 final class WiFiSettingsViewController: UIViewController {
     enum Section: Hashable { case configuration, networks }
 
-    // 表示内容ではなく、変わらないIDをSnapshotに渡す。
+    // Snapshotには項目の識別子を渡す。接続先が変わってもcurrentNetworkの識別子は同じ。
     enum Item: Hashable {
         case wifiToggle
         case currentNetwork
@@ -49,7 +49,7 @@ final class WiFiSettingsViewController: UIViewController {
             let sections = dataSource.snapshot().sectionIdentifiers
             guard sections.indices.contains(sectionIndex) else { return nil }
 
-            // 設定と接続中のネットワークは、幅いっぱいのリスト表示。
+            // 設定と接続中のネットワークは、左右に余白のある１列のリスト表示。
             if sections[sectionIndex] == .configuration {
                 var configuration = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
                 configuration.headerMode = .supplementary
@@ -150,7 +150,7 @@ final class WiFiSettingsViewController: UIViewController {
 
             switch item {
             case .wifiToggle:
-                // トグルは専用セルで構成し、アクセサリを入れ替えない。
+                // wifiToggleはtoggleRegistrationで構成するため、このRegistrationでは処理しない。
                 return
 
             case .currentNetwork:
@@ -246,7 +246,8 @@ final class WiFiSettingsViewController: UIViewController {
             snapshot.appendItems(store.availableNetworks.map { .network($0.id) }, toSection: .networks)
         }
 
-        // 内容が変わった既存セルだけを更新する。追加セルは初回構成で反映される。
+        // 呼び出し側が指定したitemsのうち、旧・新Snapshotの両方にある項目を再構成する。
+        // 内容の変更を自動検出する処理ではない。新規項目は表示用セルの構成時に最新状態を反映する。
         let existing = Set(dataSource.snapshot().itemIdentifiers)
         let incoming = Set(snapshot.itemIdentifiers)
         snapshot.reconfigureItems(items.filter { existing.contains($0) && incoming.contains($0) })
@@ -276,9 +277,11 @@ final class WiFiSettingsViewController: UIViewController {
 
     private func startScanning() {
         guard store.isEnabled, scanTimer == nil else { return }
-        // Target方式ならTimerの実行もメインRunLoop上で行われる。
+        // targetは呼び出す相手、selectorは呼び出すメソッドを指定する。作成だけでは発火しない。
         let timer = Timer(timeInterval: 5, target: self,
                           selector: #selector(scanNetworks), userInfo: nil, repeats: true)
+        // メインRunLoopに登録するため、scanNetworksはメインスレッドで呼ばれる。
+        // .commonは共通モードへの登録であり、正確な５秒間隔やバックグラウンドでの実行を保証しない。
         RunLoop.main.add(timer, forMode: .common)
         scanTimer = timer
     }
@@ -332,7 +335,7 @@ private final class WiFiToggleCell: UICollectionViewListCell {
     }
 
     func configure(isOn: Bool) {
-        // 画面外からの再表示でも、現在の状態を余計なアニメーションなしで反映する。
+        // セルの構成時に、渡されたオン・オフ状態をスイッチへアニメーションなしで反映する。
         UIView.performWithoutAnimation {
             toggle.setOn(isOn, animated: false)
         }
@@ -343,7 +346,7 @@ private final class WiFiToggleCell: UICollectionViewListCell {
     }
 }
 
-// リスト用セルのサイズ調整に依存せず、グリッドの寸法に従うセル。
+// 通常のUICollectionViewCellに部品を配置する。セルの配置枠はグリッドのレイアウトで指定する。
 private final class NetworkGridCell: UICollectionViewCell {
     private let iconView = UIImageView()
     private let nameLabel = UILabel()
