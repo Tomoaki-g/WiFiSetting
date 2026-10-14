@@ -1,39 +1,63 @@
 # WiFiSetting
 
-UIKit + UICollectionViewDiffableDataSourceを学ぶためのWi-Fi設定デモ。iOS 16以降、外部ライブラリ・Storyboardなし。
+UIKit と Diffable Data Source を学ぶための Wi-Fi 設定デモです。現在は `UITableView` と `UITableViewDiffableDataSource` を使い、設定とネットワーク一覧を１列で表示します。
+
+iOS 16 以降に対応し、外部ライブラリ・Storyboard・XIB は使用していません。
+
+## 実装の変遷
+
+最初は `UICollectionView` と `UICollectionViewDiffableDataSource` を使い、リスト形式の Wi-Fi 設定画面を実装していました。その後、Compositional Layout によるネットワーク一覧の２列表示と、Supplementary View によるセル付属バッジを試しました。
+
+現在はバッジを取り除き、`UITableView` の `.insetGrouped` スタイルで元の１列の画面構成に戻しています。データ管理と Snapshot による差分更新の考え方は維持し、セルの生成・配置、ヘッダー・フッター、タップ処理を TableView 用に変更しています。
 
 ## 起動
 
-`WiFiSetting.xcodeproj`をXcodeで開き、WiFiSettingスキームとiPhoneシミュレータを選んで実行します。実機ではSigning & CapabilitiesのTeamを設定してください。
+1. `WiFiSetting.xcodeproj` を Xcode で開きます。
+2. `WiFiSetting` スキームと iPhone シミュレータを選択します。
+3. Run で実行します。
 
-## 確認できる動作
+実機で実行する場合は、Signing & Capabilities の Team を設定してください。
 
-- Wi-Fiスイッチで接続中セルとネットワークセクションが表示・非表示になる。
-- ネットワークをタップすると接続中表示が変わる。
-- 5秒ごと、または「更新」でネットワークが追加・削除される。
-- ⓘでダミーネットワークの詳細が表示される。
-- ヘッダー・フッターと複数行セルが表示される。Dynamic Type対応。
+## 画面と動作
 
-実際のWi-Fi検出・接続・OSのスイッチ変更は行いません。オフにしてもデモの接続先は保持します。アプリを再起動すると初期状態に戻ります。
+- 設定セクションに Wi-Fi スイッチと接続中のネットワークを表示します。
+- ネットワークセクションに、接続中のものを除いたデモネットワークを名前順で表示します。
+- Wi-Fi をオフにすると、接続中の行とネットワークセクションを非表示にし、自動更新を停止します。
+- ネットワークの行をタップすると、デモの接続先と接続中の表示を切り替えます。
+- 各ネットワークの ⓘ ボタンで、デモの詳細情報を表示します。
+- ５秒間隔の Timer、または「更新」ボタンで一覧の表示パターンを切り替えます。Timer の実行時刻は、メインスレッドの処理状況などにより遅れる場合があります。
+- 行の追加・削除にはフェードを指定しています。
+- セクションの見出しと説明文は、TableView の標準ヘッダー・フッターで表示します。
+
+実際の Wi-Fi の検出・接続・端末設定の変更は行いません。スイッチをオフにしてもデモの接続先はメモリ内に保持し、アプリのプロセスを起動し直すと初期状態に戻ります。
 
 ## コードを読む順番
 
-1. `SceneDelegate.swift`: UIWindow → UINavigationController → 画面生成。
-2. `WiFiDemoStore.swift`: 表示状態と安定したネットワークID。
-3. `WiFiSettingsViewController.swift`の`setupCollectionView()`: リストレイアウト。
-4. `setupDataSource()`: CellRegistration、セルの種類、ヘッダー・フッター。
-5. `applySnapshot()`: 状態からセクション・アイテムを構築し、applyで反映。
-6. `wifiChanged` / `scanNetworks` / `didSelectItemAt`: 状態更新 → Snapshot更新。
+1. `AppDelegate.swift`：シーンの構成を作り、担当クラスに `SceneDelegate` を指定します。
+2. `SceneDelegate.swift`：ウィンドウとナビゲーションコントローラを作り、Wi-Fi 設定画面を表示します。
+3. `WiFiDemoStore.swift`：スイッチ状態、接続先、デモネットワークの表示パターンを管理します。
+4. `WiFiSettingsViewController.swift` の `viewDidLoad()`：一覧の準備 → DataSource の設定 → 初期 Snapshot の適用という順番で初期化します。
+5. `setupTableView()`：１列の TableView を作り、Auto Layout で画面に配置します。
+6. `setupDataSource()`：セルクラスを登録し、項目に応じたセルの取得・表示内容・イベントの通知先を設定します。
+7. `WiFiTableDataSource`：セクションの識別子に応じて、ヘッダー・フッターの文字列を返します。
+8. `applySnapshot()`：現在の状態から、表示するセクションと項目の順番を組み立てて適用します。
+9. `wifiChanged` / `scanNetworks` / `tableView(_:didSelectRowAt:)`：操作を受けてデータを変更し、Snapshot を更新します。
+10. `WiFiToggleTableCell`：右側のスイッチを配置し、値の変更を ViewController に通知します。
 
-Snapshotにタイトルや接続状態ではなく安定したIDを渡し、同じIDの内容変更は`reconfigureItems`で反映します。
+## 差分更新の仕組み
+
+Snapshot には表示文字列ではなく、`Section` と `Item` の識別子を渡します。ネットワークには固定の ID を使い、一覧の追加・削除・移動を Diffable Data Source が判別できるようにしています。
+
+接続中の行は、接続先が変わっても `.currentNetwork` という同じ識別子を使います。そのため、接続先を変更した際には `reconfigureItems` を指定して、名前などの表示内容を更新します。内容の変化を自動検出する処理ではありません。
 
 ## 参考
 
-- [Qiita記事のWiFiSettingsViewController](https://qiita.com/shiz/items/a6032543a237bf2e1d19)
-- [Apple: Implementing modern collection views](https://developer.apple.com/documentation/uikit/implementing-modern-collection-views)
+- [Qiita：時代の変化に応じて進化するCollectionView](https://qiita.com/shiz/items/a6032543a237bf2e1d19)
+- [Apple：Implementing modern collection views](https://developer.apple.com/documentation/uikit/implementing-modern-collection-views)
+- [Apple：UITableViewDiffableDataSource](https://developer.apple.com/documentation/uikit/uitableviewdiffabledatasource-2euir)
 
-記事の「2セクション・トグル・定期更新」の構成を、UICollectionViewのリストレイアウトで独自に実装しています。
+CollectionView 版の学習では、これらの Compositional Layout と Diffable Data Source の解説を参考にしました。現在の TableView 版は、同じデモデータと差分更新の流れを使った実装です。
 
-## 検証について
+## 検証状況
 
-XcodeでiOS Simulator向けのDebugビルド成功を確認しています（コード署名なし）。シミュレータでの起動・操作確認は未実施です。
+TableView 版は、iOS Simulator 向けの Debug ビルド成功を確認しています（コード署名なし）。行の追加・削除をフェードに変更した後のアニメーションは、実機・シミュレータで未確認です。
