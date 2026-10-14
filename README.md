@@ -37,13 +37,13 @@ iOS 16 以降に対応し、外部ライブラリ・Storyboard・XIB は使用�
 
 1. `AppDelegate.swift`：シーンの構成を作り、担当クラスに `SceneDelegate` を指定します。
 2. `SceneDelegate.swift`：ウィンドウとナビゲーションコントローラを作り、Wi-Fi 設定画面を表示します。
-3. `WiFiDemoStore.swift`：スイッチ状態、接続先、デモネットワークのデータと追加・削除処理を管理します。
+3. `WiFiDemoStore.swift`：スイッチ状態、接続先、デモネットワークのデータと追加・削除・接続処理を管理します。名前の検証は `normalizedNetworkName` にまとめています。
 4. `WiFiSettingsViewController.swift` の `viewDidLoad()`：一覧の準備 → DataSource の設定 → 初期 Snapshot の適用という順番で初期化します。
 5. `setupTableView()`：１列の TableView を作り、Auto Layout で画面に配置します。
-6. `setupDataSource()`：セルクラスを登録し、項目に応じたセルの取得・表示内容・イベントの通知先を設定します。
+6. `setupDataSource()`：セルクラスを登録し、セル提供と削除通知を接続します。`makeCell` と `configureNetworkCell` がセルの取得・表示設定を担当します。
 7. `WiFiTableDataSource`：セクションの識別子に応じて、ヘッダー・フッターの文字列を返します。
-8. `applySnapshot()`：現在の状態から、表示するセクションと項目の順番を組み立てて適用します。
-9. `wifiChanged` / `addNetworks` / `tableView(_:didSelectRowAt:)`：操作を受けてデータを変更し、Snapshot を更新します。
+8. `makeSnapshot()` / `applySnapshot()`：現在の状態から表示項目を組み立て、指定された既存項目の再構成と差分更新を適用します。
+9. `setWiFiEnabled` / `addNetworks` / `deleteNetwork` / `tableView(_:didSelectRowAt:)`：操作を受けてデータを変更し、Snapshot を更新します。
 10. `WiFiToggleTableCell`：右側のスイッチを配置し、値の変更を ViewController に通知します。
 
 ## 差分更新の仕組み

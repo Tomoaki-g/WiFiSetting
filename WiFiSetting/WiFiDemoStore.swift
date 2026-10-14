@@ -9,7 +9,7 @@ final class WiFiDemoStore {
     }
 
     var isEnabled = true
-    var connectedID: String? = "home"
+    private(set) var connectedID: String? = "home"
 
     private var catalog = [
         Network(id: "home", name: "Home Wi-Fi", isSecure: true),
@@ -23,13 +23,27 @@ final class WiFiDemoStore {
         catalog.first { $0.id == connectedID }
     }
 
-    func addNetwork(name: String, isSecure: Bool) {
+    static func normalizedNetworkName(_ text: String?) -> String? {
+        guard let text else { return nil }
+        let name = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        return name.isEmpty ? nil : name
+    }
+
+    @discardableResult
+    func addNetwork(name: String, isSecure: Bool) -> Bool {
+        guard let name = Self.normalizedNetworkName(name) else { return false }
         let network = Network(
             id: UUID().uuidString,
             name: name,
             isSecure: isSecure
         )
         catalog.append(network)
+        return true
+    }
+
+    func connect(to id: String) {
+        guard isEnabled, network(id: id) != nil else { return }
+        connectedID = id
     }
 
     func removeNetwork(id: String) {

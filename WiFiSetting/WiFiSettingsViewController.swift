@@ -10,6 +10,11 @@ final class WiFiSettingsViewController: UIViewController, UITableViewDelegate {
         case network(String)
     }
 
+    private enum ReuseIdentifier {
+        static let toggle = "WiFiToggleCell"
+        static let network = "NetworkCell"
+    }
+
     private let store = WiFiDemoStore()
     private var tableView: UITableView!
     private var dataSource: WiFiTableDataSource!
@@ -18,6 +23,15 @@ final class WiFiSettingsViewController: UIViewController, UITableViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        setupNavigationBar()
+        setupTableView()
+        setupDataSource()
+        applySnapshot(animated: false)
+    }
+
+    // MARK: - Layout
+
+    private func setupNavigationBar() {
         title = "Wi-Fi"
         view.backgroundColor = .systemGroupedBackground
 
@@ -29,14 +43,8 @@ final class WiFiSettingsViewController: UIViewController, UITableViewDelegate {
         addButton.accessibilityLabel = "追加"
 
         actionButtons = [addButton]
-        self.navigationItem.rightBarButtonItems = actionButtons
-
-        setupTableView()
-        setupDataSource()
-        applySnapshot(animated: false)
+        navigationItem.rightBarButtonItems = actionButtons
     }
-
-    // MARK: - Layout
 
     private func setupTableView() {
         tableView = UITableView(frame: .zero, style: .insetGrouped)
@@ -57,83 +65,68 @@ final class WiFiSettingsViewController: UIViewController, UITableViewDelegate {
     // MARK: - Cell registrations
 
     private func setupDataSource() {
-        tableView.register(
-            WiFiToggleTableCell.self,
-            forCellReuseIdentifier: "WiFiToggleCell"
-        )
-
-        tableView.register(
-            UITableViewCell.self,
-            forCellReuseIdentifier: "NetworkCell"
-        )
+        tableView.register(WiFiToggleTableCell.self, forCellReuseIdentifier: ReuseIdentifier.toggle)
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: ReuseIdentifier.network)
 
         dataSource = WiFiTableDataSource(tableView: tableView) { [weak self] tableView, indexPath, item in
-            guard let self else { return nil }
-
-            // ① スイッチ用セルを取得して状態と通知先を設定。
-            if item == .wifiToggle {
-                let cell = tableView.dequeueReusableCell(
-                    withIdentifier: "WiFiToggleCell",
-                    for: indexPath
-                ) as! WiFiToggleTableCell
-
-                cell.configure(isOn: self.store.isEnabled)
-                cell.onValueChanged = { [weak self] toggle in
-                    self?.wifiChanged(toggle)
-                }
-                return cell
-            }
-
-            // ② 接続中・未接続のネットワーク用セルを取得。
-            let cell = tableView.dequeueReusableCell(
-                withIdentifier: "NetworkCell",
-                for: indexPath
-            )
-
-            var content = cell.defaultContentConfiguration()
-
-            // ③ Itemに応じて、最新の表示内容を設定。
-            switch item {
-            case .currentNetwork:
-                content.text = self.store.connectedNetwork?.name
-                content.secondaryText = "接続中（デモ）"
-                content.image = UIImage(systemName: "checkmark")
-                content.imageProperties.tintColor = .systemBlue
-
-            case .network(let id):
-                guard let network = self.store.network(id: id) else {
-                    return nil
-                }
-                content.text = network.name
-                content.secondaryText = nil
-                content.image = UIImage(
-                    systemName: network.isSecure ? "lock.fill" : "wifi"
-                )
-
-            case .wifiToggle:
-                return nil // 上の専用セルの分岐で処理済み。
-            }
-
-            content.textProperties.numberOfLines = 0
-            content.secondaryTextProperties.numberOfLines = 0
-            cell.contentConfiguration = content
-            cell.accessoryType = .detailButton
-
-            return cell
+            self?.makeCell(in: tableView, at: indexPath, for: item)
         }
-
-        // DataSourceから削除対象のIDを受け取り、元データと表示を更新する。
         dataSource.onDeleteNetwork = { [weak self] id in
-            guard let self, self.store.isEnabled else { return }
-            self.store.removeNetwork(id: id)
-            self.applySnapshot()
+            self?.deleteNetwork(id: id)
         }
         dataSource.defaultRowAnimation = .fade
     }
 
+    private func makeCell(in tableView: UITableView, at indexPath: IndexPath, for item: Item) -> UITableViewCell {
+        if item == .wifiToggle {
+            let cell = tableView.dequeueReusableCell(
+                withIdentifier: ReuseIdentifier.toggle, for: indexPath
+            ) as! WiFiToggleTableCell
+            cell.configure(isOn: store.isEnabled)
+            cell.onValueChanged = { [weak self] isEnabled in
+                self?.setWiFiEnabled(isEnabled)
+            }
+            return cell
+        }
+
+        guard let network = network(for: item) else {
+            preconditionFailure("SnapshotのネットワークIDに対応するデータがありません")
+        }
+        let cell = tableView.dequeueReusableCell(
+            withIdentifier: ReuseIdentifier.network, for: indexPath
+        )
+        configureNetworkCell(cell, network: network, isConnected: item == .currentNetwork)
+        return cell
+    }
+
+    private func configureNetworkCell(
+        _ cell: UITableViewCell, network: WiFiDemoStore.Network, isConnected: Bool
+    ) {
+        var content = cell.defaultContentConfiguration()
+        content.text = network.name
+        content.secondaryText = isConnected ? "接続中（デモ）" : nil
+        content.image = UIImage(systemName: isConnected ? "checkmark" : (network.isSecure ? "lock.fill" : "wifi"))
+        content.imageProperties.tintColor = isConnected ? .systemBlue : tableView.tintColor
+        content.textProperties.numberOfLines = 0
+        content.secondaryTextProperties.numberOfLines = 0
+        cell.contentConfiguration = content
+        cell.accessoryType = .detailButton
+    }
+
+    private func network(for item: Item) -> WiFiDemoStore.Network? {
+        switch item {
+        case .currentNetwork:
+            return store.connectedNetwork
+        case .network(let id):
+            return store.network(id: id)
+        case .wifiToggle:
+            return nil
+        }
+    }
+
     // MARK: - Snapshot
 
-    private func applySnapshot(animated: Bool = true, reconfiguring items: [Item] = []) {
+    private func makeSnapshot() -> NSDiffableDataSourceSnapshot<Section, Item> {
         var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
         snapshot.appendSections([.configuration])
         snapshot.appendItems([.wifiToggle], toSection: .configuration)
@@ -144,22 +137,29 @@ final class WiFiSettingsViewController: UIViewController, UITableViewDelegate {
             snapshot.appendSections([.networks])
             snapshot.appendItems(store.availableNetworks.map { .network($0.id) }, toSection: .networks)
         }
+        return snapshot
+    }
 
-        // 呼び出し側が指定したitemsのうち、旧・新Snapshotの両方にある項目を再構成する。
-        // 内容の変更を自動検出する処理ではない。新規項目は表示用セルの構成時に最新状態を反映する。
-        let existing = Set(dataSource.snapshot().itemIdentifiers)
-        let incoming = Set(snapshot.itemIdentifiers)
-        snapshot.reconfigureItems(items.filter { existing.contains($0) && incoming.contains($0) })
+    private func applySnapshot(animated: Bool = true, reconfiguring items: [Item] = []) {
+        var snapshot = makeSnapshot()
+        // 内容の変更は自動検出されないため、指定された既存項目だけを再構成する。
+        let retainedItems = Set(dataSource.snapshot().itemIdentifiers)
+            .intersection(snapshot.itemIdentifiers)
+        snapshot.reconfigureItems(items.filter { retainedItems.contains($0) })
         dataSource.apply(snapshot, animatingDifferences: animated)
-        actionButtons.forEach { button in
-            button.isEnabled = store.isEnabled
-        }
+        actionButtons.forEach { $0.isEnabled = store.isEnabled }
     }
 
     // MARK: - Actions
 
-    @objc private func wifiChanged(_ sender: UISwitch) {
-        store.isEnabled = sender.isOn
+    private func setWiFiEnabled(_ isEnabled: Bool) {
+        store.isEnabled = isEnabled
+        applySnapshot()
+    }
+
+    private func deleteNetwork(id: String) {
+        guard store.isEnabled else { return }
+        store.removeNetwork(id: id)
         applySnapshot()
     }
 
@@ -171,54 +171,40 @@ final class WiFiSettingsViewController: UIViewController, UITableViewDelegate {
             message: "名前とセキュリティの有無を指定してください。",
             preferredStyle: .alert
         )
-
         alert.addTextField { textField in
             textField.placeholder = "ネットワーク名"
             textField.autocorrectionType = .no
         }
         alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
 
-        // 入力値を確認し、データの追加はStoreに任せる。
-        let addNetwork: (Bool) -> Void = { [weak self, weak alert] isSecure in
-            guard let self, self.store.isEnabled,
-                  let text = alert?.textFields?.first?.text else { return }
-            let name = text.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !name.isEmpty else { return }
-
-            self.store.addNetwork(name: name, isSecure: isSecure)
-            self.applySnapshot()
-        }
-
-        let secureAction = UIAlertAction(
-            title: "セキュリティありで追加", style: .default
-        ) { _ in
-            addNetwork(true)
-        }
-
-        let openAction = UIAlertAction(
-            title: "セキュリティなしで追加", style: .default
-        ) { _ in
-            addNetwork(false)
-        }
-
-        secureAction.isEnabled = false
-        openAction.isEnabled = false
+        let secureAction = makeAddNetworkAction(isSecure: true, alert: alert)
+        let openAction = makeAddNetworkAction(isSecure: false, alert: alert)
         alert.addAction(secureAction)
         alert.addAction(openAction)
 
-        // 入力のたびに両方の追加アクションを更新する。空欄・空白だけの場合は無効。
+        // 入力時と追加確定時に同じ名前の検証を使う。
         alert.textFields?.first?.addAction(
             UIAction { [weak secureAction, weak openAction] action in
                 guard let textField = action.sender as? UITextField else { return }
-                let name = (textField.text ?? "")
-                    .trimmingCharacters(in: .whitespacesAndNewlines)
-                secureAction?.isEnabled = !name.isEmpty
-                openAction?.isEnabled = !name.isEmpty
+                let hasValidName = WiFiDemoStore.normalizedNetworkName(textField.text) != nil
+                secureAction?.isEnabled = hasValidName
+                openAction?.isEnabled = hasValidName
             },
             for: .editingChanged
         )
-
         present(alert, animated: true)
+    }
+
+    private func makeAddNetworkAction(isSecure: Bool, alert: UIAlertController) -> UIAlertAction {
+        let title = isSecure ? "セキュリティありで追加" : "セキュリティなしで追加"
+        let action = UIAlertAction(title: title, style: .default) { [weak self, weak alert] _ in
+            guard let self, self.store.isEnabled,
+                  let name = alert?.textFields?.first?.text,
+                  self.store.addNetwork(name: name, isSecure: isSecure) else { return }
+            self.applySnapshot()
+        }
+        action.isEnabled = false
+        return action
     }
 
     private func showDetails(_ network: WiFiDemoStore.Network) {
@@ -252,10 +238,8 @@ private final class WiFiTableDataSource: UITableViewDiffableDataSource<WiFiSetti
     }
 
     override func tableView(_ tableView: UITableView,titleForHeaderInSection section: Int) -> String? {
-        let sections = snapshot().sectionIdentifiers
-        guard sections.indices.contains(section) else { return nil }
-
-        switch sections[section] {
+        guard let section = sectionIdentifier(at: section) else { return nil }
+        switch section {
         case .configuration:
             return nil
         case .networks:
@@ -264,16 +248,20 @@ private final class WiFiTableDataSource: UITableViewDiffableDataSource<WiFiSetti
     }
 
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-        let sections = snapshot().sectionIdentifiers
-        guard sections.indices.contains(section) else { return nil }
-
-        switch sections[section] {
+        guard let section = sectionIdentifier(at: section) else { return nil }
+        switch section {
         case .configuration:
             return "動作確認用の画面です。端末のWi-Fi設定は変更しません。"
         case .networks:
             return "接続中のネットワークは上部に表示されます。"
         }
     }
+
+    private func sectionIdentifier(at index: Int) -> WiFiSettingsViewController.Section? {
+        let sections = snapshot().sectionIdentifiers
+        return sections.indices.contains(index) ? sections[index] : nil
+    }
+
 }
 
 extension WiFiSettingsViewController {
@@ -283,7 +271,7 @@ extension WiFiSettingsViewController {
         guard let item = dataSource.itemIdentifier(for: indexPath),
               case .network(let id) = item else { return }
 
-        store.connectedID = id
+        store.connect(to: id)
         applySnapshot(reconfiguring: [.currentNetwork])
     }
 
@@ -292,18 +280,7 @@ extension WiFiSettingsViewController {
             return
         }
 
-        let network: WiFiDemoStore.Network?
-
-        switch item {
-        case .currentNetwork:
-            network = store.connectedNetwork
-        case .network(let id):
-            network = store.network(id: id)
-        case .wifiToggle:
-            return
-        }
-
-        guard let network else { return }
+        guard let network = network(for: item) else { return }
         showDetails(network)
     }
 }
@@ -311,7 +288,7 @@ extension WiFiSettingsViewController {
 // スイッチとアクセサリはセルの生成時に一度だけ作る。
 private final class WiFiToggleTableCell: UITableViewCell {
     private let toggle = UISwitch()
-    var onValueChanged: ((UISwitch) -> Void)?
+    var onValueChanged: ((Bool) -> Void)?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -336,6 +313,6 @@ private final class WiFiToggleTableCell: UITableViewCell {
     }
 
     @objc private func valueChanged(_ sender: UISwitch) {
-        onValueChanged?(sender)
+        onValueChanged?(sender.isOn)
     }
 }
