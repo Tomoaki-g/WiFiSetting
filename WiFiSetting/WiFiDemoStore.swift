@@ -10,9 +10,8 @@ final class WiFiDemoStore {
 
     var isEnabled = true
     var connectedID: String? = "home"
-    private var scanStep = 0
 
-    private let catalog = [
+    private var catalog = [
         Network(id: "home", name: "Home Wi-Fi", isSecure: true),
         Network(id: "office", name: "Office Network", isSecure: true),
         Network(id: "cafe", name: "Cafe Free Wi-Fi", isSecure: false),
@@ -24,19 +23,28 @@ final class WiFiDemoStore {
         catalog.first { $0.id == connectedID }
     }
 
-    var availableNetworks: [Network] {
-        // scan()が呼ばれるたびに、表示対象を３パターンで切り替える。各ネットワークのIDは固定。
-        // availableNetworksの読み取りだけではパターンは進まない。５秒のTimerはViewController側で管理する。
-        let visibleIDs: Set<String>
-        switch scanStep % 3 {
-        case 0: visibleIDs = ["home", "office", "cafe"]
-        case 1: visibleIDs = ["home", "office", "guest", "library"]
-        default: visibleIDs = ["home", "cafe", "guest"]
+    func addNetwork(name: String, isSecure: Bool) {
+        let network = Network(
+            id: UUID().uuidString,
+            name: name,
+            isSecure: isSecure
+        )
+        catalog.append(network)
+    }
+
+    func removeNetwork(id: String) {
+        catalog.removeAll { $0.id == id }
+
+        if connectedID == id {
+            connectedID = nil
         }
-        return catalog.filter { visibleIDs.contains($0.id) && $0.id != connectedID }
+    }
+
+    var availableNetworks: [Network] {
+        return catalog
+            .filter { $0.id != connectedID }
             .sorted { $0.name < $1.name }
     }
 
     func network(id: String) -> Network? { catalog.first { $0.id == id } }
-    func scan() { scanStep += 1 }
 }
