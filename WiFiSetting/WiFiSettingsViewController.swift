@@ -21,7 +21,10 @@ final class WiFiSettingsViewController: UIViewController, UITableViewDelegate {
         title = "Wi-Fi"
         view.backgroundColor = .systemGroupedBackground
         navigationItem.rightBarButtonItem = UIBarButtonItem(
-            title: "更新", style: .plain, target: self, action: #selector(scanNetworks)
+            title: "更新",
+            style: .plain,
+            target: self,
+            action: #selector(scanNetworks)
         )
 
         setupTableView()
@@ -66,10 +69,12 @@ final class WiFiSettingsViewController: UIViewController, UITableViewDelegate {
             WiFiToggleTableCell.self,
             forCellReuseIdentifier: "WiFiToggleCell"
         )
+        
         tableView.register(
             UITableViewCell.self,
             forCellReuseIdentifier: "NetworkCell"
         )
+        
         dataSource = WiFiTableDataSource(tableView: tableView) { [weak self] tableView, indexPath, item in
             guard let self else { return nil }
             
@@ -92,6 +97,7 @@ final class WiFiSettingsViewController: UIViewController, UITableViewDelegate {
                 withIdentifier: "NetworkCell",
                 for: indexPath
             )
+            
             var content = cell.defaultContentConfiguration()
             
             // ③ Itemに応じて、最新の表示内容を設定。
@@ -111,6 +117,7 @@ final class WiFiSettingsViewController: UIViewController, UITableViewDelegate {
                 content.image = UIImage(
                     systemName: network.isSecure ? "lock.fill" : "wifi"
                 )
+                
             case .wifiToggle:
                 return nil // 上の専用セルの分岐で処理済み。
             }
@@ -172,8 +179,12 @@ final class WiFiSettingsViewController: UIViewController, UITableViewDelegate {
     private func startScanning() {
         guard store.isEnabled, scanTimer == nil else { return }
         // targetは呼び出す相手、selectorは呼び出すメソッドを指定する。作成だけでは発火しない。
-        let timer = Timer(timeInterval: 5, target: self,
-                          selector: #selector(scanNetworks), userInfo: nil, repeats: true)
+        let timer = Timer(timeInterval: 5,
+                          target: self,
+                          selector: #selector(scanNetworks),
+                          userInfo: nil,
+                          repeats: true)
+        
         // メインRunLoopに登録するため、scanNetworksはメインスレッドで呼ばれる。
         // .commonは共通モードへの登録であり、正確な５秒間隔やバックグラウンドでの実行を保証しない。
         RunLoop.main.add(timer, forMode: .common)
@@ -195,10 +206,7 @@ final class WiFiSettingsViewController: UIViewController, UITableViewDelegate {
 }
 
 private final class WiFiTableDataSource: UITableViewDiffableDataSource<WiFiSettingsViewController.Section, WiFiSettingsViewController.Item> {
-    override func tableView(
-        _ tableView: UITableView,
-        titleForHeaderInSection section: Int
-    ) -> String? {
+    override func tableView(_ tableView: UITableView,titleForHeaderInSection section: Int) -> String? {
         let sections = snapshot().sectionIdentifiers
         guard sections.indices.contains(section) else { return nil }
 
@@ -210,10 +218,7 @@ private final class WiFiTableDataSource: UITableViewDiffableDataSource<WiFiSetti
         }
     }
 
-    override func tableView(
-        _ tableView: UITableView,
-        titleForFooterInSection section: Int
-    ) -> String? {
+    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         let sections = snapshot().sectionIdentifiers
         guard sections.indices.contains(section) else { return nil }
 
@@ -227,10 +232,7 @@ private final class WiFiTableDataSource: UITableViewDiffableDataSource<WiFiSetti
 }
 
 extension WiFiSettingsViewController: UICollectionViewDelegate {
-    func tableView(
-        _ tableView: UITableView,
-        didSelectRowAt indexPath: IndexPath
-    ) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
 
         guard let item = dataSource.itemIdentifier(for: indexPath),
@@ -240,10 +242,7 @@ extension WiFiSettingsViewController: UICollectionViewDelegate {
         applySnapshot(reconfiguring: [.currentNetwork])
     }
     
-    func tableView(
-        _ tableView: UITableView,
-        accessoryButtonTappedForRowWith indexPath: IndexPath
-    ) {
+    func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
         guard let item = dataSource.itemIdentifier(for: indexPath) else {
             return
         }
@@ -269,10 +268,7 @@ private final class WiFiToggleTableCell: UITableViewCell {
     private let toggle = UISwitch()
     var onValueChanged: ((UISwitch) -> Void)?
 
-    override init(
-        style: UITableViewCell.CellStyle,
-        reuseIdentifier: String?
-    ) {
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         var content = defaultContentConfiguration()
