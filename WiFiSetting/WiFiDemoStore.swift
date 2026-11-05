@@ -23,7 +23,7 @@ final class WiFiDemoStore {
         catalog.first { $0.id == connectedID }
     }
 
-    static func normalizedNetworkName(_ text: String?) -> String? {
+    static func normalizeNetworkName(_ text: String?) -> String? {
         guard let text else { return nil }
         let name = text.trimmingCharacters(in: .whitespacesAndNewlines)
         return name.isEmpty ? nil : name
@@ -31,7 +31,8 @@ final class WiFiDemoStore {
 
     @discardableResult
     func addNetwork(name: String, isSecure: Bool) -> Bool {
-        guard let name = Self.normalizedNetworkName(name) else { return false }
+        guard let name = Self.normalizeNetworkName(name) else { return false }
+        
         let network = Network(
             id: UUID().uuidString,
             name: name,
@@ -41,8 +42,8 @@ final class WiFiDemoStore {
         return true
     }
 
-    func connect(to id: String) {
-        guard isEnabled, network(id: id) != nil else { return }
+    func connectToNetwork(id: String) {
+        guard isEnabled, findNetwork(id: id) != nil else { return }
         connectedID = id
     }
 
@@ -60,5 +61,5 @@ final class WiFiDemoStore {
             .sorted { $0.name < $1.name }
     }
 
-    func network(id: String) -> Network? { catalog.first { $0.id == id } }
+    func findNetwork(id: String) -> Network? { catalog.first { $0.id == id } }
 }

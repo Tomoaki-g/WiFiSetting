@@ -7,7 +7,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = scene as? UIWindowScene else { return }
         let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = UINavigationController(rootViewController: WiFiSettingsViewController())
+        window.rootViewController = UINavigationController(rootViewController: SettingsViewController())
         self.window = window
         window.makeKeyAndVisible()
     }
