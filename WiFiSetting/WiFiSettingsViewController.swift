@@ -20,7 +20,7 @@ final class WiFiSettingsViewController: UIViewController, UITableViewDelegate {
     private var dataSource: WiFiTableDataSource!
     private var actionButtons: [UIBarButtonItem] = []
 
-    init(store: WiFiDemoStore = WiFiDemoStore()) {
+    init(store: WiFiDemoStore) {
         self.store = store
         super.init(nibName: nil, bundle: nil)
     }
@@ -171,14 +171,24 @@ final class WiFiSettingsViewController: UIViewController, UITableViewDelegate {
     // MARK: - Actions
 
     private func setWiFiEnabled(_ isEnabled: Bool) {
-        store.isEnabled = isEnabled
-        refreshNetworkList()
+        do {
+            try store.setWiFiEnabled(isEnabled)
+            refreshNetworkList()
+        } catch {
+            // 操作済みのスイッチを、保存されている状態へ戻す。
+            refreshNetworkList(reconfiguring: [.wifiToggle])
+            presentSaveError(error)
+        }
     }
 
     private func deleteNetwork(id: String) {
         guard store.isEnabled else { return }
-        store.removeNetwork(id: id)
-        refreshNetworkList()
+        do {
+            try store.removeNetwork(id: id)
+            refreshNetworkList()
+        } catch {
+            presentSaveError(error)
+        }
     }
 
     @objc private func presentAddNetworkAlert() {
@@ -219,9 +229,16 @@ final class WiFiSettingsViewController: UIViewController, UITableViewDelegate {
         let title = isSecure ? "セキュリティありで追加" : "セキュリティなしで追加"
         let action = UIAlertAction(title: title, style: .default) { [weak self, weak alert] _ in
             guard let self, self.store.isEnabled,
-                  let name = alert?.textFields?.first?.text,
-                  self.store.addNetwork(name: name, isSecure: isSecure) else { return }
-            self.refreshNetworkList()
+                  let name = alert?.textFields?.first?.text else { return }
+            do {
+                guard try self.store.addNetwork(name: name, isSecure: isSecure) else { return }
+                self.refreshNetworkList()
+            } catch {
+                // 入力ダイアログを閉じてからエラーを表示する。
+                self.dismiss(animated: true) {
+                    self.presentSaveError(error)
+                }
+            }
         }
         action.isEnabled = false
         return action
@@ -234,6 +251,16 @@ final class WiFiSettingsViewController: UIViewController, UITableViewDelegate {
         alert.addAction(UIAlertAction(title: "閉じる", style: .cancel))
         present(alert, animated: true)
     }
+
+    private func presentSaveError(_ error: Error) {
+        let alert = UIAlertController(
+            title: "変更を保存できませんでした",
+            message: "変更前の状態を保持しています。\n\(error.localizedDescription)",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "閉じる", style: .cancel))
+        present(alert, animated: true)
+    }
 }
 
 extension WiFiSettingsViewController {
@@ -243,8 +270,12 @@ extension WiFiSettingsViewController {
         guard let item = dataSource.itemIdentifier(for: indexPath),
               case .network(let id) = item else { return }
 
-        store.connectToNetwork(id: id)
-        refreshNetworkList(reconfiguring: [.currentNetwork])
+        do {
+            try store.connectToNetwork(id: id)
+            refreshNetworkList(reconfiguring: [.currentNetwork])
+        } catch {
+            presentSaveError(error)
+        }
     }
 
     func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {

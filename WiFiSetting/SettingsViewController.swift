@@ -1,8 +1,17 @@
 import UIKit
 
 final class SettingsViewController: UITableViewController {
-    private let store = WiFiDemoStore()
+    private let store: WiFiDemoStore
 
+    init(store: WiFiDemoStore) {
+        self.store = store
+        super.init(style: .insetGrouped)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "設定"

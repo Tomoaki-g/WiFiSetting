@@ -1,32 +1,244 @@
 // !$*UTF8*$!
-{ archiveVersion = 1; classes = {}; objectVersion = 56; objects = {
-000000000000000000000010 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-000000000000000000000014 = { isa = PBXBuildFile; fileRef = 000000000000000000000010; };
-000000000000000000000011 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-000000000000000000000015 = { isa = PBXBuildFile; fileRef = 000000000000000000000011; };
-000000000000000000000012 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiDemoStore.swift; sourceTree = "<group>"; };
-000000000000000000000016 = { isa = PBXBuildFile; fileRef = 000000000000000000000012; };
-000000000000000000000013 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiSettingsViewController.swift; sourceTree = "<group>"; };
-000000000000000000000017 = { isa = PBXBuildFile; fileRef = 000000000000000000000013; };
-000000000000000000000018 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
-000000000000000000000019 = { isa = PBXBuildFile; fileRef = 000000000000000000000018; };
-00000000000000000000001A = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiTableDataSource.swift; sourceTree = "<group>"; };
-00000000000000000000001B = { isa = PBXBuildFile; fileRef = 00000000000000000000001A; };
-00000000000000000000001C = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiToggleTableCell.swift; sourceTree = "<group>"; };
-00000000000000000000001D = { isa = PBXBuildFile; fileRef = 00000000000000000000001C; };
-000000000000000000000006 = { isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WiFiSetting.app; sourceTree = BUILT_PRODUCTS_DIR; };
-000000000000000000000002 = { isa = PBXGroup; children = (000000000000000000000003, 000000000000000000000004); sourceTree = "<group>"; };
-000000000000000000000003 = { isa = PBXGroup; children = (000000000000000000000010, 000000000000000000000011, 000000000000000000000018, 000000000000000000000012, 000000000000000000000013, 00000000000000000000001A, 00000000000000000000001C); path = WiFiSetting; sourceTree = "<group>"; };
-000000000000000000000004 = { isa = PBXGroup; children = (000000000000000000000006); name = Products; sourceTree = "<group>"; };
-000000000000000000000007 = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (000000000000000000000014, 000000000000000000000015, 000000000000000000000019, 000000000000000000000016, 000000000000000000000017, 00000000000000000000001B, 00000000000000000000001D); runOnlyForDeploymentPostprocessing = 0; };
-000000000000000000000008 = { isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
-000000000000000000000009 = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
-000000000000000000000005 = { isa = PBXNativeTarget; buildConfigurationList = 00000000000000000000000B; buildPhases = (000000000000000000000007, 000000000000000000000008, 000000000000000000000009); buildRules = (); dependencies = (); name = WiFiSetting; productName = WiFiSetting; productReference = 000000000000000000000006; productType = "com.apple.product-type.application"; };
-000000000000000000000001 = { isa = PBXProject; attributes = { BuildIndependentTargetsInParallel = YES; LastUpgradeCheck = 1600; TargetAttributes = { 000000000000000000000005 = { CreatedOnToolsVersion = 16.0; }; }; }; buildConfigurationList = 00000000000000000000000A; compatibilityVersion = "Xcode 14.0"; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, ja, Base); mainGroup = 000000000000000000000002; productRefGroup = 000000000000000000000004; projectDirPath = ""; projectRoot = ""; targets = (000000000000000000000005); };
-00000000000000000000000A = { isa = XCConfigurationList; buildConfigurations = (00000000000000000000000C, 00000000000000000000000D); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
-00000000000000000000000C = { isa = XCBuildConfiguration; buildSettings = { CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; SDKROOT = iphoneos; IPHONEOS_DEPLOYMENT_TARGET = 16.0; DEBUG_INFORMATION_FORMAT = dwarf; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG; }; name = Debug; };
-00000000000000000000000D = { isa = XCBuildConfiguration; buildSettings = { CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; SDKROOT = iphoneos; IPHONEOS_DEPLOYMENT_TARGET = 16.0; DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym"; SWIFT_COMPILATION_MODE = wholemodule; SWIFT_OPTIMIZATION_LEVEL = "-O"; }; name = Release; };
-00000000000000000000000B = { isa = XCConfigurationList; buildConfigurations = (00000000000000000000000E, 00000000000000000000000F); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
-00000000000000000000000E = { isa = XCBuildConfiguration; buildSettings = { CODE_SIGN_STYLE = Automatic; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = WiFiSetting/Info.plist; PRODUCT_BUNDLE_IDENTIFIER = "com.tomoakig.WiFiSetting"; PRODUCT_NAME = "$(TARGET_NAME)"; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = "1,2"; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; SUPPORTS_MACCATALYST = NO; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks"); }; name = Debug; };
-00000000000000000000000F = { isa = XCBuildConfiguration; buildSettings = { CODE_SIGN_STYLE = Automatic; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = WiFiSetting/Info.plist; PRODUCT_BUNDLE_IDENTIFIER = "com.tomoakig.WiFiSetting"; PRODUCT_NAME = "$(TARGET_NAME)"; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = "1,2"; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; SUPPORTS_MACCATALYST = NO; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks"); }; name = Release; };
-}; rootObject = 000000000000000000000001; }
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		000000000000000000000014 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000010 /* AppDelegate.swift */; };
+		000000000000000000000015 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000011 /* SceneDelegate.swift */; };
+		000000000000000000000016 /* WiFiDemoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000012 /* WiFiDemoStore.swift */; };
+		000000000000000000000017 /* WiFiSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000013 /* WiFiSettingsViewController.swift */; };
+		000000000000000000000019 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000018 /* SettingsViewController.swift */; };
+		00000000000000000000001B /* WiFiTableDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000001A /* WiFiTableDataSource.swift */; };
+		00000000000000000000001D /* WiFiToggleTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000001C /* WiFiToggleTableCell.swift */; };
+		189C6C80309C54B300538883 /* NetworkFileStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189C6C7F309C54B300538883 /* NetworkFileStorage.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		000000000000000000000006 /* WiFiSetting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WiFiSetting.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000010 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		000000000000000000000011 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		000000000000000000000012 /* WiFiDemoStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiDemoStore.swift; sourceTree = "<group>"; };
+		000000000000000000000013 /* WiFiSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiSettingsViewController.swift; sourceTree = "<group>"; };
+		000000000000000000000018 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		00000000000000000000001A /* WiFiTableDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiTableDataSource.swift; sourceTree = "<group>"; };
+		00000000000000000000001C /* WiFiToggleTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiToggleTableCell.swift; sourceTree = "<group>"; };
+		189C6C7F309C54B300538883 /* NetworkFileStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkFileStorage.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		000000000000000000000008 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		000000000000000000000002 = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000000003 /* WiFiSetting */,
+				000000000000000000000004 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		000000000000000000000003 /* WiFiSetting */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000000010 /* AppDelegate.swift */,
+				000000000000000000000011 /* SceneDelegate.swift */,
+				000000000000000000000018 /* SettingsViewController.swift */,
+				000000000000000000000012 /* WiFiDemoStore.swift */,
+				000000000000000000000013 /* WiFiSettingsViewController.swift */,
+				00000000000000000000001A /* WiFiTableDataSource.swift */,
+				00000000000000000000001C /* WiFiToggleTableCell.swift */,
+				189C6C7F309C54B300538883 /* NetworkFileStorage.swift */,
+			);
+			path = WiFiSetting;
+			sourceTree = "<group>";
+		};
+		000000000000000000000004 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000000006 /* WiFiSetting.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		000000000000000000000005 /* WiFiSetting */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 00000000000000000000000B /* Build configuration list for PBXNativeTarget "WiFiSetting" */;
+			buildPhases = (
+				000000000000000000000007 /* Sources */,
+				000000000000000000000008 /* Frameworks */,
+				000000000000000000000009 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WiFiSetting;
+			productName = WiFiSetting;
+			productReference = 000000000000000000000006 /* WiFiSetting.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		000000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					000000000000000000000005 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = 00000000000000000000000A /* Build configuration list for PBXProject "WiFiSetting" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				ja,
+				Base,
+			);
+			mainGroup = 000000000000000000000002;
+			productRefGroup = 000000000000000000000004 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				000000000000000000000005 /* WiFiSetting */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		000000000000000000000009 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		000000000000000000000007 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				000000000000000000000014 /* AppDelegate.swift in Sources */,
+				000000000000000000000015 /* SceneDelegate.swift in Sources */,
+				189C6C80309C54B300538883 /* NetworkFileStorage.swift in Sources */,
+				000000000000000000000019 /* SettingsViewController.swift in Sources */,
+				000000000000000000000016 /* WiFiDemoStore.swift in Sources */,
+				000000000000000000000017 /* WiFiSettingsViewController.swift in Sources */,
+				00000000000000000000001B /* WiFiTableDataSource.swift in Sources */,
+				00000000000000000000001D /* WiFiToggleTableCell.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		00000000000000000000000C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		00000000000000000000000D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		00000000000000000000000E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = WiFiSetting/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tomoakig.WiFiSetting;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		00000000000000000000000F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = WiFiSetting/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tomoakig.WiFiSetting;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		00000000000000000000000A /* Build configuration list for PBXProject "WiFiSetting" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				00000000000000000000000C /* Debug */,
+				00000000000000000000000D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		00000000000000000000000B /* Build configuration list for PBXNativeTarget "WiFiSetting" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				00000000000000000000000E /* Debug */,
+				00000000000000000000000F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 000000000000000000000001 /* Project object */;
+}
